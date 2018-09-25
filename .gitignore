@@ -26,6 +26,16 @@ vendor
 envfile
 minikube.kubeconfig
 
+<<<<<<< HEAD
 # binaries
 cmd/cluster-controller/cluster-controller
 cmd/machine-controller/machine-controller
+=======
+# bazel
+/bazel-bin
+/bazel-cluster-api-provider-aws
+/bazel-genfiles
+/bazel-out
+/bazel-testlogs
+
+>>>>>>> Bazel-ify the build
