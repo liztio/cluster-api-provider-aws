@@ -14,6 +14,7 @@
 
 GOFLAGS += -ldflags '-extldflags "-static"'
 GOREBUILD :=
+PLATFORM_PREFIX := --platforms=@io_bazel_rules_go//go/toolchain
 
 .PHONY: gendeepcopy
 
@@ -29,13 +30,18 @@ endif
 vendor:
 	dep version || go get -u github.com/golang/dep/cmd/dep
 	dep ensure
+	./hack/update-bazel.sh
 
+.PHONY: depend-update
 depend-update:
 	dep version || go get -u github.com/golang/dep/cmd/dep
 	dep ensure -update
+	./hack/update-bazel.sh
 
+.PHONY: generate
 generate: gendeepcopy
 
+.PHONY: gendeepcopy
 gendeepcopy: vendor
 	go build -o $$GOPATH/bin/deepcopy-gen sigs.k8s.io/cluster-api-provider-aws/vendor/k8s.io/code-generator/cmd/deepcopy-gen
 	$$GOPATH/bin/deepcopy-gen \
@@ -43,6 +49,7 @@ gendeepcopy: vendor
 	  -O zz_generated.deepcopy \
 	  -h boilerplate.go.txt
 
+.PHONY: genmocks
 genmocks: vendor
 	hack/generate-mocks.sh "github.com/aws/aws-sdk-go/service/ec2/ec2iface EC2API" "cloud/aws/services/ec2/mock_ec2iface/mock.go"
 	hack/generate-mocks.sh "github.com/aws/aws-sdk-go/service/elb/elbiface ELBAPI" "cloud/aws/services/elb/mock_elbiface/mock.go"
@@ -54,32 +61,63 @@ genmocks: vendor
 
 build: clusterctl-bin clusterawsadm-bin cluster-controller machine-controller
 
-clusterctl-bin: vendor
-	CGO_ENABLED=0 go install $(GOFLAGS) $(GOREBUILD) sigs.k8s.io/cluster-api-provider-aws/clusterctl
+.PHONY: build
+build: vendor
+	bazel build $(PLATFORM_PREFIX):linux_amd64 //cmd/cluster-controller:cluster-controller //cmd/machine-controller:machine-controller
+	bazel build //clusterctl:clusterctl //cmd/clusterawsadm
 
-clusterawsadm-bin: vendor
-	CGO_ENABLED=0 go install $(GOFLAGS) $(GOREBUILD) sigs.k8s.io/cluster-api-provider-aws/cmd/clusterawsadm
+.PHONY: multiarch
+multiarch:
+	$(MAKE) build_clis_for_arch ARCH=linux_amd64
+	$(MAKE) build_clis_for_arch ARCH=darwin_amd64
+	$(MAKE) build_clis_for_arch ARCH=windows_amd64
+	$(MAKE) build_clis_for_arch ARCH=linux_arm
+	$(MAKE) build_clis_for_arch ARCH=linux_arm64
 
-cluster-api-dev-helper-bin: vendor
-	CGO_ENABLED=0 go install $(GOFLAGS) sigs.k8s.io/cluster-api-provider-aws/hack/cluster-api-dev-helper
+.PHONY: build_clis_for_arch
+build_clis_for_arch:
+	bazel build --platforms=@io_bazel_rules_go//go/toolchain:$(ARCH) //clusterctl:clusterctl //cmd/clusterawsadm
 
+.PHONY: images
 images: vendor
-	$(MAKE) -C cmd/cluster-controller image
-	$(MAKE) -C cmd/machine-controller image
+	bazel build $(PLATFORM_PREFIX):linux_amd64  //cmd/cluster-controller:cluster-controller-image
+	bazel build $(PLATFORM_PREFIX):linux_amd64  //cmd/machine-controller:machine-controller-image
 
-dev_push: cluster-controller-dev-push machine-controller-dev-push
+.PHONY: dev_push
+dev_push: vendor cluster-controller-dev-push machine-controller-dev-push
 
-cluster-controller: vendor
-	CGO_ENABLED=0 go install $(GOFLAGS) $(GOREBUILD) sigs.k8s.io/cluster-api-provider-aws/cmd/cluster-controller
+.PHONY: image_dev_push_with_registry
+image_dev_push_with_registry:
+	bazel run $(PLATFORM_PREFIX):linux_amd64 \
+	  //cmd/$(IMAGE):$(IMAGE)-push-dev \
+		--define=dev_registry=$(DEV_REGISTRY)  \
+		--define=dev_repository=$(IMAGE) \
+		--define=dev_repo_prefix=$(DEV_REPO_PREFIX)
 
-cluster-controller-dev-push: cluster-controller
-	$(MAKE) -C cmd/cluster-controller dev_push
+.PHONY: image_dev_push
+ifeq ($(DEV_REPO_TYPE),GCR)
+image_dev_push:
+	make image_dev_push_with_registry \
+		DEV_REGISTRY=gcr.io \
+		DEV_REPO_PREFIX=$(shell gcloud config get-value project)/ \
+		IMAGE=$(IMAGE)
+endif
 
-machine-controller: vendor
-	CGO_ENABLED=0 go install $(GOFLAGS) $(GOREBUILD) sigs.k8s.io/cluster-api-provider-aws/cmd/machine-controller
+ifeq ($(DEV_REPO_TYPE),ECR)
+image_dev_push:
+	make image_dev_push_with_registry \
+		DEV_REGISTRY=$(shell aws sts get-caller-identity | jq .Account -r).dkr.ecr.$(AWS_REGION).amazonaws.com \
+		DEV_REPO_PREFIX="" \
+		IMAGE=$(IMAGE)
+endif
 
-machine-controller-dev-push: machine-controller
-	$(MAKE) -C cmd/machine-controller dev_push
+.PHONY: cluster-controller-dev-push
+cluster-controller-dev-push:
+	$(MAKE) image_dev_push IMAGE=cluster-controller
+
+.PHONY: machine-controller-dev-push
+machine-controller-dev-push:
+	$(MAKE) image_dev_push IMAGE=machine-controller
 
 push: vendor
 	$(MAKE) -C cmd/cluster-controller push

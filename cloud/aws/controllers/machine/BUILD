@@ -9,7 +9,6 @@ go_library(
         "//cloud/aws/actuators/machine:go_default_library",
         "//cloud/aws/controllers/machine/options:go_default_library",
         "//cloud/aws/providerconfig/v1alpha1:go_default_library",
-        "//cloud/aws/services/cluster:go_default_library",
         "//cloud/aws/services/ec2:go_default_library",
         "//vendor/github.com/aws/aws-sdk-go/aws/session:go_default_library",
         "//vendor/github.com/aws/aws-sdk-go/service/ec2:go_default_library",
