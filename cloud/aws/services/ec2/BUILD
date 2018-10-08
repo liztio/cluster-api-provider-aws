@@ -24,6 +24,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cloud/aws/providerconfig/v1alpha1:go_default_library",
+        "//cloud/aws/services/certificates:go_default_library",
         "//cloud/aws/services/wait:go_default_library",
         "//vendor/github.com/aws/aws-sdk-go/aws:go_default_library",
         "//vendor/github.com/aws/aws-sdk-go/aws/awserr:go_default_library",

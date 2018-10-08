@@ -27,6 +27,10 @@ GOREBUILD += -a
 .PHONY: vendor
 endif
 
+.PHONY: gazelle
+gazelle:
+	bazel run //:gazelle
+
 vendor:
 	dep version || go get -u github.com/golang/dep/cmd/dep
 	dep ensure
@@ -59,15 +63,13 @@ genmocks: vendor
 	hack/generate-mocks.sh "sigs.k8s.io/cluster-api-provider-aws/cloud/aws/services EC2Interface" "cloud/aws/services/mocks/ec2.go"
 	hack/generate-mocks.sh "sigs.k8s.io/cluster-api-provider-aws/cloud/aws/services ELBInterface" "cloud/aws/services/mocks/elb.go"
 
-build: clusterctl-bin clusterawsadm-bin cluster-controller machine-controller
-
 .PHONY: build
 build: vendor
 	bazel build $(PLATFORM_PREFIX):linux_amd64 //cmd/cluster-controller:cluster-controller //cmd/machine-controller:machine-controller
 	bazel build //clusterctl:clusterctl //cmd/clusterawsadm
 
 .PHONY: multiarch
-multiarch:
+multiarch: vendor
 	$(MAKE) build_clis_for_arch ARCH=linux_amd64
 	$(MAKE) build_clis_for_arch ARCH=darwin_amd64
 	$(MAKE) build_clis_for_arch ARCH=windows_amd64
@@ -75,7 +77,7 @@ multiarch:
 	$(MAKE) build_clis_for_arch ARCH=linux_arm64
 
 .PHONY: build_clis_for_arch
-build_clis_for_arch:
+build_clis_for_arch: vendor
 	bazel build --platforms=@io_bazel_rules_go//go/toolchain:$(ARCH) //clusterctl:clusterctl //cmd/clusterawsadm
 
 .PHONY: images
@@ -87,7 +89,7 @@ images: vendor
 dev_push: vendor cluster-controller-dev-push machine-controller-dev-push
 
 .PHONY: image_dev_push_with_registry
-image_dev_push_with_registry:
+image_dev_push_with_registry: vendor
 	bazel run $(PLATFORM_PREFIX):linux_amd64 \
 	  //cmd/$(IMAGE):$(IMAGE)-push-dev \
 		--define=dev_registry=$(DEV_REGISTRY)  \
@@ -96,7 +98,7 @@ image_dev_push_with_registry:
 
 .PHONY: image_dev_push
 ifeq ($(DEV_REPO_TYPE),GCR)
-image_dev_push:
+image_dev_push: vendor
 	make image_dev_push_with_registry \
 		DEV_REGISTRY=gcr.io \
 		DEV_REPO_PREFIX=$(shell gcloud config get-value project)/ \
@@ -104,7 +106,7 @@ image_dev_push:
 endif
 
 ifeq ($(DEV_REPO_TYPE),ECR)
-image_dev_push:
+image_dev_push: vendor
 	make image_dev_push_with_registry \
 		DEV_REGISTRY=$(shell aws sts get-caller-identity | jq .Account -r).dkr.ecr.$(AWS_REGION).amazonaws.com \
 		DEV_REPO_PREFIX="" \
@@ -118,10 +120,6 @@ cluster-controller-dev-push:
 .PHONY: machine-controller-dev-push
 machine-controller-dev-push:
 	$(MAKE) image_dev_push IMAGE=machine-controller
-
-push: vendor
-	$(MAKE) -C cmd/cluster-controller push
-	$(MAKE) -C cmd/machine-controller push
 
 check: fmt vet
 
