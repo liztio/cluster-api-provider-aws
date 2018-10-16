@@ -1,0 +1,1659 @@
+diff -urN -x .git controller-runtime/example/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/example/BUILD.bazel
+--- controller-runtime/example/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/example/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,43 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "controller.go",
++        "main.go",
++        "mutatingwebhook.go",
++        "validatingwebhook.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/example",
++    visibility = ["//visibility:private"],
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/client/config:go_default_library",
++        "//pkg/controller:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/manager:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/runtime/signals:go_default_library",
++        "//pkg/source:go_default_library",
++        "//pkg/webhook:go_default_library",
++        "//pkg/webhook/admission:go_default_library",
++        "//pkg/webhook/admission/builder:go_default_library",
++        "//pkg/webhook/admission/types:go_default_library",
++        "@com_github_go_logr_logr//:go_default_library",
++        "@io_k8s_api//admissionregistration/v1beta1:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/errors:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++        "@io_k8s_client_go//plugin/pkg/client/auth/gcp:go_default_library",
++    ],
++)
++
++go_binary(
++    name = "example",
++    importpath = "sigs.k8s.io/controller-runtime/example",
++    library = ":go_default_library",
++    visibility = ["//visibility:public"],
++)
+diff -urN -x .git controller-runtime/pkg/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/BUILD.bazel
+--- controller-runtime/pkg/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,8 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["doc.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg",
++    visibility = ["//visibility:public"],
++)
+diff -urN -x .git controller-runtime/pkg/builder/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/builder/BUILD.bazel
+--- controller-runtime/pkg/builder/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/builder/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,65 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "build.go",
++        "doc.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/builder",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/client/apiutil:go_default_library",
++        "//pkg/client/config:go_default_library",
++        "//pkg/controller:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/manager:go_default_library",
++        "//pkg/predicate:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/source:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "build_test.go",
++        "builder_suite_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/builder",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/client/apiutil:go_default_library",
++        "//pkg/controller:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/manager:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = ["example_test.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/builder_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/runtime/signals:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/cache/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/cache/BUILD.bazel
+--- controller-runtime/pkg/cache/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/cache/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,51 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "cache.go",
++        "informer_cache.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/cache",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/cache/internal:go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/client/apiutil:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/meta:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1/unstructured:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/cache:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "cache_suite_test.go",
++        "cache_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/cache_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/errors:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1/unstructured:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_client_go//kubernetes:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/cache:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/cache/informertest/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/cache/informertest/BUILD.bazel
+--- controller-runtime/pkg/cache/informertest/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/cache/informertest/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["fake_cache.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/cache/informertest",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/cache:go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/controller/controllertest:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//tools/cache:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/cache/internal/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/cache/internal/BUILD.bazel
+--- controller-runtime/pkg/cache/internal/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/cache/internal/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,30 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "cache_reader.go",
++        "deleg_map.go",
++        "informers_map.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/cache/internal",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/client/apiutil:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/errors:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/meta:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1/unstructured:go_default_library",
++        "@io_k8s_apimachinery//pkg/fields:go_default_library",
++        "@io_k8s_apimachinery//pkg/labels:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/serializer:go_default_library",
++        "@io_k8s_apimachinery//pkg/selection:go_default_library",
++        "@io_k8s_apimachinery//pkg/watch:go_default_library",
++        "@io_k8s_client_go//dynamic:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/cache:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/client/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/client/BUILD.bazel
+--- controller-runtime/pkg/client/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/client/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,56 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "client.go",
++        "client_cache.go",
++        "interfaces.go",
++        "split.go",
++        "typed_client.go",
++        "unstructured_client.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/client",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/client/apiutil:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/meta:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1/unstructured:go_default_library",
++        "@io_k8s_apimachinery//pkg/fields:go_default_library",
++        "@io_k8s_apimachinery//pkg/labels:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/serializer:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++        "@io_k8s_client_go//dynamic:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "client_suite_test.go",
++        "client_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/client_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/errors:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1/unstructured:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_client_go//kubernetes:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/client/apiutil/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/client/apiutil/BUILD.bazel
+--- controller-runtime/pkg/client/apiutil/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/client/apiutil/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,17 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["apimachinery.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/client/apiutil",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@io_k8s_apimachinery//pkg/api/meta:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/serializer:go_default_library",
++        "@io_k8s_client_go//discovery:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//restmapper:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/client/config/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/client/config/BUILD.bazel
+--- controller-runtime/pkg/client/config/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/client/config/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,16 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "config.go",
++        "doc.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/client/config",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/runtime/log:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/clientcmd:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/client/fake/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/client/fake/BUILD.bazel
+--- controller-runtime/pkg/client/fake/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/client/fake/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,43 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "client.go",
++        "doc.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/client/fake",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/client/apiutil:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/meta:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//testing:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "client_suite_test.go",
++        "client_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/client/fake",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/controller/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/controller/BUILD.bazel
+--- controller-runtime/pkg/controller/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/controller/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,52 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "controller.go",
++        "doc.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/controller",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/handler:go_default_library",
++        "//pkg/internal/controller:go_default_library",
++        "//pkg/manager:go_default_library",
++        "//pkg/predicate:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/source:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "controller_integration_test.go",
++        "controller_suite_test.go",
++        "controller_test.go",
++        "example_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/controller_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/manager:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/runtime/signals:go_default_library",
++        "//pkg/source:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++        "@io_k8s_client_go//kubernetes:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/controller/controllertest/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/controller/controllertest/BUILD.bazel
+--- controller-runtime/pkg/controller/controllertest/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/controller/controllertest/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "testing.go",
++        "util.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/controller/controllertest",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_client_go//tools/cache:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/controller/controllerutil/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/controller/controllerutil/BUILD.bazel
+--- controller-runtime/pkg/controller/controllerutil/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/controller/controllerutil/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,45 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "controllerutil.go",
++        "doc.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/client/apiutil:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/errors:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "controllerutil_suite_test.go",
++        "controllerutil_test.go",
++        "example_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_api//extensions/v1beta1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/envtest/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/envtest/BUILD.bazel
+--- controller-runtime/pkg/envtest/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/envtest/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,44 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "crd.go",
++        "doc.go",
++        "ginkgo.go",
++        "server.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/envtest",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/client/config:go_default_library",
++        "//pkg/envtest/printer:go_default_library",
++        "@com_github_ghodss_yaml//:go_default_library",
++        "@io_k8s_apiextensions_apiserver//pkg/apis/apiextensions/v1beta1:go_default_library",
++        "@io_k8s_apiextensions_apiserver//pkg/client/clientset/clientset:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_apimachinery//pkg/util/sets:go_default_library",
++        "@io_k8s_apimachinery//pkg/util/wait:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_sigs_testing_frameworks//integration:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "envtest_suite_test.go",
++        "envtest_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/envtest",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_apiextensions_apiserver//pkg/apis/apiextensions/v1beta1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/envtest/printer/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/envtest/printer/BUILD.bazel
+--- controller-runtime/pkg/envtest/printer/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/envtest/printer/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,13 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["ginkgo.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/envtest/printer",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_ginkgo//config:go_default_library",
++        "@com_github_onsi_ginkgo//types:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/event/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/event/BUILD.bazel
+--- controller-runtime/pkg/event/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/event/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "event.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/event",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/handler/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/handler/BUILD.bazel
+--- controller-runtime/pkg/handler/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/handler/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,53 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "enqueue.go",
++        "enqueue_mapped.go",
++        "enqueue_owner.go",
++        "eventhandler.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/handler",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/event:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "eventhandler_suite_test.go",
++        "eventhandler_test.go",
++        "example_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/handler_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/controller:go_default_library",
++        "//pkg/controller/controllertest:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/event:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/source:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/internal/admission/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/internal/admission/BUILD.bazel
+--- controller-runtime/pkg/internal/admission/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/internal/admission/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,39 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "decode.go",
++        "doc.go",
++        "handler.go",
++        "http.go",
++        "response.go",
++        "tls.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/internal/admission",
++    visibility = ["//pkg:__subpackages__"],
++    deps = [
++        "//pkg/runtime/log:go_default_library",
++        "@io_k8s_api//admission/v1beta1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/serializer:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "example_admissionfunc_test.go",
++        "example_decode_test.go",
++        "example_handlefunc_test.go",
++        "example_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/internal/admission_test",
++    deps = [
++        ":go_default_library",
++        "@io_k8s_api//admission/v1beta1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/internal/controller/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/internal/controller/BUILD.bazel
+--- controller-runtime/pkg/internal/controller/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/internal/controller/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,54 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["controller.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/internal/controller",
++    visibility = ["//pkg:__subpackages__"],
++    deps = [
++        "//pkg/cache:go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/predicate:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/source:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/util/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/util/wait:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/record:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "controller_suite_test.go",
++        "controller_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/internal/controller",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/cache:go_default_library",
++        "//pkg/cache/informertest:go_default_library",
++        "//pkg/controller/controllertest:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/predicate:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/reconcile/reconciletest:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/source:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++        "@io_k8s_client_go//kubernetes:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/internal/recorder/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/internal/recorder/BUILD.bazel
+--- controller-runtime/pkg/internal/recorder/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/internal/recorder/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,49 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["recorder.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/internal/recorder",
++    visibility = ["//pkg:__subpackages__"],
++    deps = [
++        "//pkg/recorder:go_default_library",
++        "@com_github_go_logr_logr//:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//kubernetes:go_default_library",
++        "@io_k8s_client_go//kubernetes/typed/core/v1:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/record:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "recorder_integration_test.go",
++        "recorder_suite_test.go",
++        "recorder_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/internal/recorder_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/controller:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/manager:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/source:go_default_library",
++        "@com_github_go_logr_logr//testing:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/watch:go_default_library",
++        "@io_k8s_client_go//kubernetes:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/reference:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/leaderelection/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/leaderelection/BUILD.bazel
+--- controller-runtime/pkg/leaderelection/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/leaderelection/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,18 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "leader_election.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/leaderelection",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/recorder:go_default_library",
++        "@io_k8s_apimachinery//pkg/util/uuid:go_default_library",
++        "@io_k8s_client_go//kubernetes:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/leaderelection/resourcelock:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/leaderelection/fake/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/leaderelection/fake/BUILD.bazel
+--- controller-runtime/pkg/leaderelection/fake/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/leaderelection/fake/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,19 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "leader_election.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/leaderelection/fake",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/leaderelection:go_default_library",
++        "//pkg/recorder:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/util/uuid:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/leaderelection/resourcelock:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/manager/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/manager/BUILD.bazel
+--- controller-runtime/pkg/manager/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/manager/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,75 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "internal.go",
++        "manager.go",
++        "testutil.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/manager",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/cache:go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/client/apiutil:go_default_library",
++        "//pkg/internal/recorder:go_default_library",
++        "//pkg/leaderelection:go_default_library",
++        "//pkg/recorder:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/webhook/admission:go_default_library",
++        "//pkg/webhook/admission/types:go_default_library",
++        "@com_github_go_logr_logr//:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/meta:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/leaderelection:go_default_library",
++        "@io_k8s_client_go//tools/leaderelection/resourcelock:go_default_library",
++        "@io_k8s_client_go//tools/record:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "manager_suite_test.go",
++        "manager_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/manager",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/cache:go_default_library",
++        "//pkg/cache/informertest:go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/leaderelection:go_default_library",
++        "//pkg/leaderelection/fake:go_default_library",
++        "//pkg/reconcile:go_default_library",
++        "//pkg/recorder:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_go_logr_logr//:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/meta:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//kubernetes:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//tools/leaderelection/resourcelock:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = ["example_test.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/manager_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/client/config:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/runtime/signals:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/patch/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/patch/BUILD.bazel
+--- controller-runtime/pkg/patch/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/patch/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "patch.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/patch",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@com_github_mattbaird_jsonpatch//:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/patterns/application/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/patterns/application/BUILD.bazel
+--- controller-runtime/pkg/patterns/application/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/patterns/application/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,8 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["doc.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/patterns/application",
++    visibility = ["//visibility:public"],
++)
+diff -urN -x .git controller-runtime/pkg/patterns/operator/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/patterns/operator/BUILD.bazel
+--- controller-runtime/pkg/patterns/operator/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/patterns/operator/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,8 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["doc.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/patterns/operator",
++    visibility = ["//visibility:public"],
++)
+diff -urN -x .git controller-runtime/pkg/predicate/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/predicate/BUILD.bazel
+--- controller-runtime/pkg/predicate/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/predicate/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,35 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "predicate.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/predicate",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/event:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "example_test.go",
++        "predicate_suite_test.go",
++        "predicate_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/predicate_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/event:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/reconcile/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/reconcile/BUILD.bazel
+--- controller-runtime/pkg/reconcile/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/reconcile/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,30 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "reconcile.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/reconcile",
++    visibility = ["//visibility:public"],
++    deps = ["@io_k8s_apimachinery//pkg/types:go_default_library"],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "example_test.go",
++        "reconcile_suite_test.go",
++        "reconcile_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/reconcile_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/reconcile/reconciletest/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/reconcile/reconciletest/BUILD.bazel
+--- controller-runtime/pkg/reconcile/reconciletest/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/reconcile/reconciletest/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["reconcile.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/reconcile/reconciletest",
++    visibility = ["//visibility:public"],
++    deps = ["//pkg/reconcile:go_default_library"],
++)
+diff -urN -x .git controller-runtime/pkg/recorder/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/recorder/BUILD.bazel
+--- controller-runtime/pkg/recorder/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/recorder/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["recorder.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/recorder",
++    visibility = ["//visibility:public"],
++    deps = ["@io_k8s_client_go//tools/record:go_default_library"],
++)
+diff -urN -x .git controller-runtime/pkg/runtime/inject/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/runtime/inject/BUILD.bazel
+--- controller-runtime/pkg/runtime/inject/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/runtime/inject/BUILD.bazel	2018-10-16 15:11:13.000000000 -0400
+@@ -0,0 +1,38 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "inject.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/runtime/inject",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/cache:go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/webhook/admission/types:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "inject_suite_test.go",
++        "inject_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/runtime/inject",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/cache:go_default_library",
++        "//pkg/cache/informertest:go_default_library",
++        "//pkg/client:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/runtime/log/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/runtime/log/BUILD.bazel
+--- controller-runtime/pkg/runtime/log/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/runtime/log/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,34 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "deleg.go",
++        "log.go",
++        "null.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/runtime/log",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@com_github_go_logr_logr//:go_default_library",
++        "@com_github_go_logr_zapr//:go_default_library",
++        "@org_uber_go_zap//:go_default_library",
++        "@org_uber_go_zap//zapcore:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "log_suite_test.go",
++        "log_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/runtime/log",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/envtest/printer:go_default_library",
++        "@com_github_go_logr_logr//:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/runtime/scheme/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/runtime/scheme/BUILD.bazel
+--- controller-runtime/pkg/runtime/scheme/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/runtime/scheme/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,30 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["scheme.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/runtime/scheme",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "scheme_suite_test.go",
++        "scheme_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/runtime/scheme_test",
++    deps = [
++        ":go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/runtime/signals/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/runtime/signals/BUILD.bazel
+--- controller-runtime/pkg/runtime/signals/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/runtime/signals/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,32 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "signal.go",
++        "signal_posix.go",
++    ] + select({
++        "@io_bazel_rules_go//go/platform:windows_amd64": [
++            "signal_windows.go",
++        ],
++        "//conditions:default": [],
++    }),
++    importpath = "sigs.k8s.io/controller-runtime/pkg/runtime/signals",
++    visibility = ["//visibility:public"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "signal_test.go",
++        "signals_suite_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/runtime/signals",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/envtest:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/source/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/source/BUILD.bazel
+--- controller-runtime/pkg/source/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/source/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,53 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "source.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/source",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/cache:go_default_library",
++        "//pkg/event:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/predicate:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/source/internal:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "example_test.go",
++        "source_integration_test.go",
++        "source_suite_test.go",
++        "source_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/source_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/cache:go_default_library",
++        "//pkg/cache/informertest:go_default_library",
++        "//pkg/controller:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/event:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/predicate:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//apps/v1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//kubernetes:go_default_library",
++        "@io_k8s_client_go//rest:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/source/internal/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/source/internal/BUILD.bazel
+--- controller-runtime/pkg/source/internal/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/source/internal/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,46 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["eventsource.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/source/internal",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/event:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/predicate:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/meta:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//tools/cache:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_xtest",
++    srcs = [
++        "internal_suite_test.go",
++        "internal_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/source/internal_test",
++    deps = [
++        ":go_default_library",
++        "//pkg/controller/controllertest:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/event:go_default_library",
++        "//pkg/handler:go_default_library",
++        "//pkg/predicate:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/meta:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_client_go//tools/cache:go_default_library",
++        "@io_k8s_client_go//util/workqueue:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/webhook/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/BUILD.bazel
+--- controller-runtime/pkg/webhook/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,33 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "bootstrap.go",
++        "doc.go",
++        "server.go",
++        "util.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/client/config:go_default_library",
++        "//pkg/manager:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/webhook/admission:go_default_library",
++        "//pkg/webhook/admission/types:go_default_library",
++        "//pkg/webhook/internal/cert:go_default_library",
++        "//pkg/webhook/internal/cert/writer:go_default_library",
++        "//pkg/webhook/types:go_default_library",
++        "@com_github_ghodss_yaml//:go_default_library",
++        "@io_k8s_api//admissionregistration/v1beta1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/errors:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++        "@io_k8s_apimachinery//pkg/util/intstr:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/webhook/admission/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/admission/BUILD.bazel
+--- controller-runtime/pkg/webhook/admission/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/admission/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,57 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "decode.go",
++        "doc.go",
++        "http.go",
++        "response.go",
++        "webhook.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/admission",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/patch:go_default_library",
++        "//pkg/runtime/inject:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/webhook/admission/types:go_default_library",
++        "//pkg/webhook/types:go_default_library",
++        "@com_github_mattbaird_jsonpatch//:go_default_library",
++        "@io_k8s_api//admission/v1beta1:go_default_library",
++        "@io_k8s_api//admissionregistration/v1beta1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/serializer:go_default_library",
++        "@io_k8s_apimachinery//pkg/util/runtime:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "admission_suite_test.go",
++        "decode_test.go",
++        "http_test.go",
++        "response_test.go",
++        "webhook_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/admission",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/envtest:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/webhook/admission/types:go_default_library",
++        "//pkg/webhook/types:go_default_library",
++        "@com_github_mattbaird_jsonpatch//:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//admission/v1beta1:go_default_library",
++        "@io_k8s_api//admissionregistration/v1beta1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_client_go//kubernetes/scheme:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/webhook/admission/builder/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/admission/builder/BUILD.bazel
+--- controller-runtime/pkg/webhook/admission/builder/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/admission/builder/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,20 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "builder.go",
++        "doc.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/admission/builder",
++    visibility = ["//visibility:public"],
++    deps = [
++        "//pkg/client/apiutil:go_default_library",
++        "//pkg/manager:go_default_library",
++        "//pkg/webhook/admission:go_default_library",
++        "//pkg/webhook/types:go_default_library",
++        "@io_k8s_api//admissionregistration/v1beta1:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/webhook/admission/types/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/admission/types/BUILD.bazel
+--- controller-runtime/pkg/webhook/admission/types/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/admission/types/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,13 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["types.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/admission/types",
++    visibility = ["//visibility:public"],
++    deps = [
++        "@com_github_mattbaird_jsonpatch//:go_default_library",
++        "@io_k8s_api//admission/v1beta1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/webhook/internal/cert/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/BUILD.bazel
+--- controller-runtime/pkg/webhook/internal/cert/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,38 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "doc.go",
++        "provisioner.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert",
++    visibility = ["//pkg/webhook:__subpackages__"],
++    deps = [
++        "//pkg/webhook/internal/cert/generator:go_default_library",
++        "//pkg/webhook/internal/cert/writer:go_default_library",
++        "@io_k8s_api//admissionregistration/v1beta1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "provisioner_test.go",
++        "suite_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/envtest:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/webhook/internal/cert/generator:go_default_library",
++        "//pkg/webhook/internal/cert/writer:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//admissionregistration/v1beta1:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/webhook/internal/cert/generator/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/generator/BUILD.bazel
+--- controller-runtime/pkg/webhook/internal/cert/generator/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/generator/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,23 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "certgenerator.go",
++        "doc.go",
++        "selfsigned.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/generator",
++    visibility = ["//pkg/webhook:__subpackages__"],
++    deps = ["@io_k8s_client_go//util/cert:go_default_library"],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "certgenerator_test.go",
++        "selfsigned_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/generator",
++    library = ":go_default_library",
++)
+diff -urN -x .git controller-runtime/pkg/webhook/internal/cert/generator/fake/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/generator/fake/BUILD.bazel
+--- controller-runtime/pkg/webhook/internal/cert/generator/fake/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/generator/fake/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,9 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["certgenerator.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/generator/fake",
++    visibility = ["//pkg/webhook:__subpackages__"],
++    deps = ["//pkg/webhook/internal/cert/generator:go_default_library"],
++)
+diff -urN -x .git controller-runtime/pkg/webhook/internal/cert/writer/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/writer/BUILD.bazel
+--- controller-runtime/pkg/webhook/internal/cert/writer/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/writer/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,54 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = [
++        "certwriter.go",
++        "doc.go",
++        "error.go",
++        "fs.go",
++        "secret.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/writer",
++    visibility = ["//pkg/webhook:__subpackages__"],
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/webhook/internal/cert/generator:go_default_library",
++        "//pkg/webhook/internal/cert/writer/atomic:go_default_library",
++        "@com_github_ghodss_yaml//:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/errors:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = [
++        "certwriter_test.go",
++        "fs_test.go",
++        "secret_test.go",
++        "suite_test.go",
++    ],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/writer",
++    library = ":go_default_library",
++    deps = [
++        "//pkg/client:go_default_library",
++        "//pkg/client/fake:go_default_library",
++        "//pkg/envtest:go_default_library",
++        "//pkg/runtime/log:go_default_library",
++        "//pkg/webhook/internal/cert/generator:go_default_library",
++        "//pkg/webhook/internal/cert/generator/fake:go_default_library",
++        "@com_github_onsi_ginkgo//:go_default_library",
++        "@com_github_onsi_gomega//:go_default_library",
++        "@io_k8s_api//core/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/api/errors:go_default_library",
++        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime:go_default_library",
++        "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
++        "@io_k8s_apimachinery//pkg/types:go_default_library",
++    ],
++)
+diff -urN -x .git controller-runtime/pkg/webhook/internal/cert/writer/atomic/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/writer/atomic/BUILD.bazel
+--- controller-runtime/pkg/webhook/internal/cert/writer/atomic/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/writer/atomic/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,32 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["atomic_writer.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/writer/atomic",
++    visibility = ["//pkg/webhook:__subpackages__"],
++    deps = [
++        "@com_github_go_logr_logr//:go_default_library",
++        "@io_k8s_apimachinery//pkg/util/sets:go_default_library",
++    ],
++)
++
++go_test(
++    name = "go_default_test",
++    srcs = select({
++        "@io_bazel_rules_go//go/platform:linux_amd64": [
++            "atomic_writer_test.go",
++        ],
++        "//conditions:default": [],
++    }),
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/internal/cert/writer/atomic",
++    library = ":go_default_library",
++    deps = select({
++        "@io_bazel_rules_go//go/platform:linux_amd64": [
++            "@com_github_go_logr_logr//testing:go_default_library",
++            "@io_k8s_apimachinery//pkg/util/sets:go_default_library",
++            "@io_k8s_client_go//util/testing:go_default_library",
++        ],
++        "//conditions:default": [],
++    }),
++)
+diff -urN -x .git controller-runtime/pkg/webhook/types/BUILD.bazel /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/types/BUILD.bazel
+--- controller-runtime/pkg/webhook/types/BUILD.bazel	1969-12-31 19:00:00.000000000 -0500
++++ /Users/liz/src/sigs.k8s.io/controller-runtime/pkg/webhook/types/BUILD.bazel	2018-10-16 15:11:14.000000000 -0400
+@@ -0,0 +1,8 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["webhook.go"],
++    importpath = "sigs.k8s.io/controller-runtime/pkg/webhook/types",
++    visibility = ["//visibility:public"],
++)

@@ -6,10 +6,10 @@ go_library(
     importpath = "sigs.k8s.io/cluster-api-provider-aws/pkg/cloud/aws/actuators/cluster/mock_clusteriface",
     visibility = ["//visibility:public"],
     deps = [
-        "//vendor/github.com/golang/mock/gomock:go_default_library",
-        "//vendor/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//vendor/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//vendor/k8s.io/apimachinery/pkg/watch:go_default_library",
-        "//vendor/sigs.k8s.io/cluster-api/pkg/apis/cluster/v1alpha1:go_default_library",
+        "@com_github_golang_mock//gomock:go_default_library",
+        "@io_k8s_apimachinery//pkg/apis/meta/v1:go_default_library",
+        "@io_k8s_apimachinery//pkg/types:go_default_library",
+        "@io_k8s_apimachinery//pkg/watch:go_default_library",
+        "@io_k8s_sigs_cluster_api//pkg/apis/cluster/v1alpha1:go_default_library",
     ],
 )

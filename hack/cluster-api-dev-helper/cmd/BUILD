@@ -10,5 +10,5 @@ go_library(
     ],
     importpath = "sigs.k8s.io/cluster-api-provider-aws/hack/cluster-api-dev-helper/cmd",
     visibility = ["//visibility:public"],
-    deps = ["//vendor/github.com/spf13/cobra:go_default_library"],
+    deps = ["@com_github_spf13_cobra//:go_default_library"],
 )

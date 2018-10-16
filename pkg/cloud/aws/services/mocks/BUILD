@@ -10,7 +10,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/apis/awsproviderconfig/v1alpha1:go_default_library",
-        "//vendor/github.com/golang/mock/gomock:go_default_library",
-        "//vendor/sigs.k8s.io/cluster-api/pkg/apis/cluster/v1alpha1:go_default_library",
+        "@com_github_golang_mock//gomock:go_default_library",
+        "@io_k8s_sigs_cluster_api//pkg/apis/cluster/v1alpha1:go_default_library",
     ],
 )

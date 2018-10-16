@@ -7,6 +7,6 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/cloud/aws/services/awserrors:go_default_library",
-        "//vendor/k8s.io/apimachinery/pkg/util/wait:go_default_library",
+        "@io_k8s_apimachinery//pkg/util/wait:go_default_library",
     ],
 )

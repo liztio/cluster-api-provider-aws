@@ -14,12 +14,12 @@ go_library(
         "//pkg/apis/awsproviderconfig/v1alpha1:go_default_library",
         "//pkg/cloud/aws/services/awserrors:go_default_library",
         "//pkg/cloud/aws/services/wait:go_default_library",
-        "//vendor/github.com/aws/aws-sdk-go/aws:go_default_library",
-        "//vendor/github.com/aws/aws-sdk-go/aws/awserr:go_default_library",
-        "//vendor/github.com/aws/aws-sdk-go/service/elb:go_default_library",
-        "//vendor/github.com/aws/aws-sdk-go/service/elb/elbiface:go_default_library",
-        "//vendor/github.com/golang/glog:go_default_library",
-        "//vendor/github.com/pkg/errors:go_default_library",
+        "@com_github_aws_aws_sdk_go//aws:go_default_library",
+        "@com_github_aws_aws_sdk_go//aws/awserr:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/elb:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/elb/elbiface:go_default_library",
+        "@com_github_golang_glog//:go_default_library",
+        "@com_github_pkg_errors//:go_default_library",
     ],
 )
 
@@ -29,6 +29,6 @@ go_test(
     embed = [":go_default_library"],
     deps = [
         "//pkg/cloud/aws/services/elb/mock_elbiface:go_default_library",
-        "//vendor/github.com/golang/mock/gomock:go_default_library",
+        "@com_github_golang_mock//gomock:go_default_library",
     ],
 )

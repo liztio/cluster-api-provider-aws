@@ -8,10 +8,9 @@ go_library(
     deps = [
         "//pkg/cloud/aws/services/cloudformation:go_default_library",
         "//pkg/cloud/aws/services/sts:go_default_library",
-        "//vendor/github.com/aws/aws-sdk-go/aws/session:go_default_library",
-        "//vendor/github.com/aws/aws-sdk-go/service/cloudformation:go_default_library",
-        "//vendor/github.com/aws/aws-sdk-go/service/sts:go_default_library",
-        "//vendor/github.com/golang/glog:go_default_library",
-        "//vendor/github.com/spf13/cobra:go_default_library",
+        "@com_github_aws_aws_sdk_go//aws/session:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/cloudformation:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/sts:go_default_library",
+        "@com_github_spf13_cobra//:go_default_library",
     ],
 )
