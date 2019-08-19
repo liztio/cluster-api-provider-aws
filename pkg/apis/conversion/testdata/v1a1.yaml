@@ -1,0 +1,58 @@
+---
+apiVersion: "cluster.k8s.io/v1alpha1"
+kind: Cluster
+metadata:
+  namespace: equestria
+  name: ponyville
+spec:
+  clusterNetwork:
+    services:
+      cidrBlocks: ["10.96.0.0/12"]
+    pods:
+      cidrBlocks: ["192.168.0.0/16"]
+    serviceDomain: "cluster.local"
+  providerSpec:
+    value:
+      apiVersion: "awsprovider/v1alpha1"
+      kind: "AWSClusterProviderSpec"
+      region: "us-east-1"
+      sshKeyName: "default"
+---
+apiVersion: "cluster.k8s.io/v1alpha1"
+kind: Machine
+metadata:
+  namespace: equestria
+  name: ponyville-controlplane-0
+  labels:
+    cluster.k8s.io/cluster-name: ponyville
+    set: controlplane
+spec:
+  versions:
+    kubelet: v1.14.4
+    controlPlane: v1.14.4
+  providerSpec:
+    value:
+      apiVersion: awsprovider/v1alpha1
+      kind: AWSMachineProviderSpec
+      instanceType: "t2.medium"
+      iamInstanceProfile: "control-plane.cluster-api-provider-aws.sigs.k8s.io"
+      keyName: "default"
+---
+apiVersion: "cluster.k8s.io/v1alpha1"
+kind: Machine
+metadata:
+  namespace: equestria
+  generateName: ponyville-node-
+  labels:
+    cluster.k8s.io/cluster-name: ponyville
+    set: node
+spec:
+  versions:
+    kubelet: v1.14.4
+  providerSpec:
+    value:
+      apiVersion: awsprovider/v1alpha1
+      kind: AWSMachineProviderSpec
+      instanceType: "t2.medium"
+      iamInstanceProfile: "nodes.cluster-api-provider-aws.sigs.k8s.io"
+      keyName: "default"

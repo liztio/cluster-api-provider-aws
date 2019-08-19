@@ -196,6 +196,11 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddConversionFunc((*v1alpha1.AWSMachineProviderSpec)(nil), (*AWSMachineSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_AWSMachineProviderSpec_To_v1alpha2_AWSMachineSpec(a.(*v1alpha1.AWSMachineProviderSpec), b.(*AWSMachineSpec), scope)
+	}); err != nil {
+		return err
+	}
 	return nil
 }
 

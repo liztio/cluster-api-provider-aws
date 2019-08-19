@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha2
 
 import (
+	unsafe "unsafe"
+
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	v1alpha1 "sigs.k8s.io/cluster-api-provider-aws/pkg/apis/awsprovider/v1alpha1"
 )
@@ -26,8 +28,8 @@ func Convert_v1alpha1_AWSClusterProviderSpec_To_v1alpha2_AWSClusterSpec(in *v1al
 		return err
 	}
 
-	in.Region = out.Region
-	in.SSHKeyName = out.SSHKeyName
+	out.Region = in.Region
+	out.SSHKeyName = in.SSHKeyName
 
 	// DISCARDS:
 	// CAKeyPair
@@ -41,7 +43,6 @@ func Convert_v1alpha1_AWSClusterProviderSpec_To_v1alpha2_AWSClusterSpec(in *v1al
 }
 
 func Convert_v1alpha1_AWSClusterProviderStatus_To_v1alpha2_AWSClusterStatus(in *v1alpha1.AWSClusterProviderStatus, out *AWSClusterStatus, s conversion.Scope) error {
-
 	if err := Convert_v1alpha1_Network_To_v1alpha2_Network(&in.Network, &out.Network, s); err != nil {
 		return err
 	}
@@ -49,6 +50,42 @@ func Convert_v1alpha1_AWSClusterProviderStatus_To_v1alpha2_AWSClusterStatus(in *
 	if err := Convert_v1alpha1_Instance_To_v1alpha2_Instance(&in.Bastion, &out.Bastion, s); err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func Convert_v1alpha1_AWSMachineProviderSpec_To_v1alpha2_AWSMachineSpec(in *v1alpha1.AWSMachineProviderSpec, out *AWSMachineSpec, s conversion.Scope) error {
+
+	if err := Convert_v1alpha1_AWSResourceReference_To_v1alpha2_AWSResourceReference(&in.AMI, &out.AMI, s); err != nil {
+		return err
+	}
+
+	out.ImageLookupOrg = in.ImageLookupOrg
+	out.InstanceType = in.InstanceType
+	out.AdditionalTags = *(*map[string]string)(unsafe.Pointer(&in.AdditionalTags))
+	out.IAMInstanceProfile = in.IAMInstanceProfile
+	out.PublicIP = (*bool)(unsafe.Pointer(in.PublicIP))
+
+	out.AdditionalSecurityGroups = make([]AWSResourceReference, len(in.AdditionalSecurityGroups))
+
+	for i, sg := range in.AdditionalSecurityGroups {
+		if err := Convert_v1alpha1_AWSResourceReference_To_v1alpha2_AWSResourceReference(&sg, &out.AdditionalSecurityGroups[i], s); err != nil {
+			return err
+		}
+	}
+
+	out.AvailabilityZone = (*string)(unsafe.Pointer(in.AvailabilityZone))
+
+	var subnet AWSResourceReference
+
+	if err := Convert_v1alpha1_AWSResourceReference_To_v1alpha2_AWSResourceReference(in.Subnet, &subnet, s); err != nil {
+		return err
+	}
+
+	out.Subnet = &subnet
+
+	out.KeyName = in.KeyName
+	out.RootDeviceSize = in.RootDeviceSize
 
 	return nil
 }
