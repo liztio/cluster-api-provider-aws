@@ -23,6 +23,7 @@ import (
 	v1alpha1 "sigs.k8s.io/cluster-api-provider-aws/pkg/apis/awsprovider/v1alpha1"
 )
 
+// nolint
 func Convert_v1alpha1_AWSClusterProviderSpec_To_v1alpha2_AWSClusterSpec(in *v1alpha1.AWSClusterProviderSpec, out *AWSClusterSpec, s conversion.Scope) error {
 	if err := Convert_v1alpha1_NetworkSpec_To_v1alpha2_NetworkSpec(&in.NetworkSpec, &out.NetworkSpec, s); err != nil {
 		return err
@@ -42,6 +43,7 @@ func Convert_v1alpha1_AWSClusterProviderSpec_To_v1alpha2_AWSClusterSpec(in *v1al
 	return nil
 }
 
+// nolint
 func Convert_v1alpha1_AWSClusterProviderStatus_To_v1alpha2_AWSClusterStatus(in *v1alpha1.AWSClusterProviderStatus, out *AWSClusterStatus, s conversion.Scope) error {
 	if err := Convert_v1alpha1_Network_To_v1alpha2_Network(&in.Network, &out.Network, s); err != nil {
 		return err
@@ -54,6 +56,7 @@ func Convert_v1alpha1_AWSClusterProviderStatus_To_v1alpha2_AWSClusterStatus(in *
 	return nil
 }
 
+// nolint
 func Convert_v1alpha1_AWSMachineProviderSpec_To_v1alpha2_AWSMachineSpec(in *v1alpha1.AWSMachineProviderSpec, out *AWSMachineSpec, s conversion.Scope) error {
 
 	if err := Convert_v1alpha1_AWSResourceReference_To_v1alpha2_AWSResourceReference(&in.AMI, &out.AMI, s); err != nil {

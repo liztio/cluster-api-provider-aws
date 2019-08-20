@@ -95,7 +95,7 @@ func getMachine(t *testing.T) (*capiv1a1.Machine, *capav1a1.AWSMachineProviderSp
 func TestConvertMachine(t *testing.T) {
 	oldMachine, oldAWSMachine := getMachine(t)
 
-	newMachine, newAWSMachine, err := convertMachine(oldMachine)
+	newMachine, newAWSMachine, err := ConvertMachine(oldMachine)
 
 	if err != nil {
 		t.Fatalf("Unexpected error converting machine: %v", err)
@@ -125,6 +125,15 @@ func TestConvertMachine(t *testing.T) {
 
 	// Pull the provider ID from the machine (why is it in both places?)
 	assert.stringPtrEqual(newAWSMachine.Spec.ProviderID, newMachine.Spec.ProviderID, "aws machine provider ID")
+
+	assert.stringEqual(newAWSMachine.Name, oldMachine.Name, "aws machine name")
+	assert.stringEqual(newAWSMachine.Namespace, oldMachine.Namespace, "aws machine namespace")
+
+	assert.stringEqual(newAWSMachine.Name, newMachine.Spec.InfrastructureRef.Name, "infra ref name")
+	assert.stringEqual(newAWSMachine.Namespace, newMachine.Spec.InfrastructureRef.Namespace, "infra ref namespace")
+	assert.stringEqual("AWSMachine", newMachine.Spec.InfrastructureRef.Kind, "infra ref kind")
+	assert.stringEqual("infrastructure.cluster.x-k8s.io/v1alpha2", newMachine.Spec.InfrastructureRef.APIVersion, "infra ref APIVersion")
+
 	assert.awsRefEqual(&oldAWSMachine.AMI, &newAWSMachine.Spec.AMI, "AMI")
 	assert.stringEqual(oldAWSMachine.ImageLookupOrg, newAWSMachine.Spec.ImageLookupOrg, "image lookup org")
 	assert.stringEqual(oldAWSMachine.InstanceType, newAWSMachine.Spec.InstanceType, "instance type")

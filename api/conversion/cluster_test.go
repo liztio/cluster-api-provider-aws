@@ -90,7 +90,7 @@ func getCluster(t *testing.T) (*capiv1a1.Cluster, *capav1a1.AWSClusterProviderSp
 func TestConvertCluster(t *testing.T) {
 	oldCluster, oldAWSCluster := getCluster(t)
 
-	newCluster, newAWSCluster, err := convertCluster(oldCluster)
+	newCluster, newAWSCluster, err := ConvertCluster(oldCluster)
 	if err != nil {
 		t.Fatalf("Unexpected error running convertCluster: %v", err)
 	}
