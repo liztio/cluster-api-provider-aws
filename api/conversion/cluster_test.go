@@ -44,14 +44,14 @@ spec:
       - "10.100.0.0/24"
     pods:
       cidrBlocks:
-      - "10.100.0.0/24"
+      - "10.100.10.0/24"
     serviceDomain: "gov.ponyville.eq"
   providerSpec:
     value:
       networkSpec:
         vpc:
           id: "vpc-m4g1c"
-          cidrBlock: "192.168.0.0./24"
+          cidrBlock: "192.168.0.0/24"
           internetGatewayId: "i-shy"
           tags:
             vpc: "ismagic"
@@ -183,7 +183,6 @@ func TestConvertCluster(t *testing.T) {
 
 	assert.stringEqual(oldCluster.Name, newCluster.Name, "name")
 	assert.stringEqual(oldCluster.Namespace, newCluster.Namespace, "namespace")
-	assert.stringEqual(string(oldCluster.UID), string(newCluster.UID), "UID")
 
 	assert.stringArrayEqual(
 		oldCluster.Spec.ClusterNetwork.Services.CIDRBlocks,
@@ -241,9 +240,7 @@ func TestConvertCluster(t *testing.T) {
 	if newCluster.Spec.InfrastructureRef == nil {
 		t.Error("Unexpectedly nil infrastructure ref")
 	} else {
-		assert.notEmpty(newAWSCluster.Name, "awscluster name")
 		assert.stringEqual(newCluster.Spec.InfrastructureRef.Name, newAWSCluster.Name, "aws cluster ref name")
-		assert.notEmpty(newAWSCluster.Namespace, "awscluster namespace")
 		assert.stringEqual(newCluster.Spec.InfrastructureRef.Namespace, newAWSCluster.Namespace, "aws cluster ref namespace")
 		assert.stringEqual(newCluster.Spec.InfrastructureRef.Kind, "AWSCluster", "aws cluster ref kind")
 		assert.stringEqual(newCluster.Spec.InfrastructureRef.APIVersion, "infrastructure.cluster.x-k8s.io/v1alpha2", "aws cluster ref apiversion")
